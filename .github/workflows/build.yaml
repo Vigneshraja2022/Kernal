@@ -1,0 +1,35 @@
+name: Simple Kernel Module CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up build environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential linux-headers-$(uname -r)
+
+    - name: Compile and load kernel module
+      run: |
+        make -C /lib/modules/$(uname -r)/build M=$PWD modules
+        sudo insmod hello.ko
+
+    - name: Run tests
+      run: |
+        # Add any test commands here
+
+    - name: Clean up
+      run: |
+        sudo rmmod hello
+           if [ -f hello.ko ]; then
+        rm hello.ko
+           fi
